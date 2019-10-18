@@ -1,0 +1,42 @@
+{
+  "name": "chat_client",
+  "version": "0.1.0",
+  "private": true,
+  "browser": "index.html",
+  "scripts": {
+    "test": "react-scripts test --env=jsdom",
+    "init": "npm install && npm run build:dev",
+    "build": "webpack",
+    "build:sa": "webpack-dev-server -d --env=standalone"
+  },
+  "dependencies": {
+    "@material-ui/core": "^4.5.1",
+    "classnames": "^2.2.6",
+    "elemental": "^0.6.1",
+    "react": "^16.10.2",
+    "react-dom": "^16.10.2",
+    "typeface-roboto": "0.0.75"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.6.4",
+    "@babel/preset-env": "^7.6.3",
+    "@babel/preset-flow": "^7.0.0",
+    "@babel/preset-react": "^7.6.3",
+    "babel-loader": "^8.0.6",
+    "css-loader": "^3.2.0",
+    "eslint-loader": "^3.0.2",
+    "eslint-plugin-react-hooks": "^2.1.2",
+    "file-loader": "^4.2.0",
+    "flow-bin": "^0.109.0",
+    "less-loader": "^5.0.0",
+    "node-sass": "^4.12.0",
+    "path": "^0.12.7",
+    "react-hot-loader": "^4.12.15",
+    "react-scripts": "0.9.5",
+    "sass-loader": "^8.0.0",
+    "style-loader": "^1.0.0",
+    "webpack": "^4.41.1",
+    "webpack-cli": "^3.3.9",
+    "webpack-dev-server": "^3.8.2"
+  }
+}
