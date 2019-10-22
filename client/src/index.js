@@ -12,6 +12,8 @@ import { Route, BrowserRouter as Router, Link, Switch } from 'react-router-dom'
 import { Chat, Login, Signup } from './Chat';
 import { NotFound } from './Utilities';
 
+require("babel-polyfill");
+
 const routing = (
   <Router>
     <Switch>

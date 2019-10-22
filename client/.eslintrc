@@ -1,6 +1,7 @@
 {
     "parser": "babel-eslint",
     "plugins": [
+      "eslint-plugin-react-hooks",
       "react-hooks"
     ],
     "rules": {

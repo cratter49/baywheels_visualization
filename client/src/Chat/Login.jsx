@@ -1,10 +1,11 @@
 // React
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 // Hooks
 import { useInput } from '../Hooks';
 
 // Utilities
+import axios from 'axios';
 import classNames from 'classnames';
 import { Link } from 'react-router-dom';
 
@@ -15,6 +16,7 @@ type Props = {
   cookie: ?string
 }
 
+// Styles
 const useStyles = makeStyles({
   '@global': {
     body: {
@@ -38,6 +40,39 @@ export default function Login(props: Props)
   const { value: userName, bind: bindUserName, reset: resetUserName } = useInput('');
   const { value: password, bind: bindPassword, reset: resetPassword } = useInput('');
 
+  const [isSending, setIsSending] = useState(false);
+  const isMounted = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      isMounted.current = false
+    }
+  }, []);
+
+  const sendLoginRequest = useCallback(async () => {
+    // If the request is still sending don't send another request
+    if(isSending)
+      return;
+
+    setIsSending(true);
+
+    try {
+      const response = await axios.get('http://localhost:3001/api/getUser', {
+        params: {
+          name: userName,
+          password: password 
+        }
+      });
+    }
+    catch(err) {
+      console.error(err)
+    }
+
+    // Only allow another request to go through if the component is still mounted
+    if(isMounted.current)
+      setIsSending(false);
+  }, [userName, password, isSending]);
+
   return (
     <Container 
       maxWidth='xs' 
@@ -51,7 +86,7 @@ export default function Login(props: Props)
         gutterBottom={true}>
         Login
       </Typography>
-      <form method='get'>
+      <form noValidate>
         <TextField 
           id='username'
           name='username' 
@@ -79,8 +114,9 @@ export default function Login(props: Props)
           variant='outlined'
           color='primary'
           className={classes.submit}
-          disabled={!(userName && password)}
-          fullWidth>
+          disabled={!(userName && password) || isSending}
+          fullWidth
+          onClick={sendLoginRequest}>
           Login
         </Button>
         <Grid container alignItems='center'>

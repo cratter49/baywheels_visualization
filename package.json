@@ -1,0 +1,25 @@
+{
+  "name": "chat_application",
+  "version": "1.0.0",
+  "author": "Daniel Wiseman",
+  "description": "A fully functioning chat application with a client and server implemented using the MERN stack.",
+  "license": "MIT",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"cd backend && node --inspect server.js\" \"cd client && npm run build:sa\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cratter49/chat_application.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cratter49/chat_application/issues"
+  },
+  "homepage": "https://github.com/cratter49/chat_application#readme",
+  "dependencies": {
+    "concurrently": "^5.0.0"
+  },
+  "devDependencies": {
+    "babel-polyfill": "^6.26.0"
+  }
+}
