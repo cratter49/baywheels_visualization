@@ -1,3 +1,5 @@
+// Built using example: https://stackoverflow.com/questions/55647287/how-to-send-request-on-click-react-hooks-way
+
 import { useState } from 'react';
 
 export const useInput = initialValue => {

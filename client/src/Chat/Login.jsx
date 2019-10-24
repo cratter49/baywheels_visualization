@@ -1,3 +1,7 @@
+// Built using examples:
+//  Async Button Hook - https://stackoverflow.com/questions/55647287/how-to-send-request-on-click-react-hooks-
+//  Login Page Layout - https://material-ui.com/getting-started/templates/
+
 // React
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -11,10 +15,6 @@ import { Link } from 'react-router-dom';
 
 // Material-UI
 import { Button, Container, CssBaseline, Grid, makeStyles, TextField, Typography } from '@material-ui/core';
-
-type Props = {
-  cookie: ?string
-}
 
 // Styles
 const useStyles = makeStyles({
@@ -32,7 +32,7 @@ const useStyles = makeStyles({
   }
 });
 
-export default function Login(props: Props)
+export default function Login()
 {
   const classes = useStyles();
 
@@ -50,6 +50,8 @@ export default function Login(props: Props)
   }, []);
 
   const sendLoginRequest = useCallback(async () => {
+    let response;
+
     // If the request is still sending don't send another request
     if(isSending)
       return;
@@ -57,7 +59,7 @@ export default function Login(props: Props)
     setIsSending(true);
 
     try {
-      const response = await axios.get('http://localhost:3001/api/getUser', {
+      response = await axios.get('http://localhost:3001/api/getUser', {
         params: {
           name: userName,
           password: password 
@@ -68,10 +70,18 @@ export default function Login(props: Props)
       console.error(err)
     }
 
+    // If the user was not found reset the login form
+    if(response.data.err)
+    {
+      console.log(response.data.err);
+      resetUserName();
+      resetPassword();
+    }
+
     // Only allow another request to go through if the component is still mounted
     if(isMounted.current)
       setIsSending(false);
-  }, [userName, password, isSending]);
+  }, [userName, password, isSending, resetUserName, resetPassword]);
 
   return (
     <Container 

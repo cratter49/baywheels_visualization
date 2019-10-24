@@ -5,8 +5,16 @@ const Schema = mongoose.Schema;
 
 // this will be our data base's data structure 
 const UserSchema = new Schema({
-  name: String,
-  password: String
+  name: {
+    type: String,
+    trim: true,
+    required: true
+  },
+  password: {
+    type: String,
+    trim: true,
+    required: true
+  }
 });
 
 // export the new Schema so we could modify it using Node.js
