@@ -24,16 +24,20 @@ exports.post = (req, res) => {
 };  
 
 // this method attempts to fetch a specific user in our database
-exports.get = (req, res) => {
+exports.get = (req, res, next) => {
     const { name, password } = req.query;
   
     User.find({name: name, password: password}, (err, data) => {
       var result = {}, success = false;
   
       if (err)
-        result.err = err;
+      {
+        next(err);
+      }
       else if(!data.length)
-        result.err = 'User was not found';
+      {
+        res.status(404).send('User was not found');
+      }
       else
       {
         result.data = data;

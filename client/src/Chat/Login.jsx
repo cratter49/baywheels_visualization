@@ -14,7 +14,7 @@ import classNames from 'classnames';
 import { Link } from 'react-router-dom';
 
 // Material-UI
-import { Button, Container, CssBaseline, Grid, makeStyles, TextField, Typography } from '@material-ui/core';
+import { Button, Container, CssBaseline, Grid, makeStyles, TextField, Tooltip, Typography } from '@material-ui/core';
 
 // Styles
 const useStyles = makeStyles({
@@ -36,12 +36,32 @@ export default function Login()
 {
   const classes = useStyles();
 
-  // State with custom input hooks
+  //
+  // State
+  //
+
+  // Custom input hooks
   const { value: userName, bind: bindUserName, reset: resetUserName } = useInput('');
   const { value: password, bind: bindPassword, reset: resetPassword } = useInput('');
 
+  const [errorMessage, setErrorMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
+
+  //
+  // Refs
+  //
+
   const isMounted = useRef(true);
+
+  //
+  // Vars
+  //
+
+  let isLoginReady = !!(userName && password)
+
+  //
+  // React Hooks
+  //
 
   useEffect(() => {
     return () => {
@@ -58,7 +78,8 @@ export default function Login()
 
     setIsSending(true);
 
-    try {
+    try 
+    {
       response = await axios.get('http://localhost:3001/api/getUser', {
         params: {
           name: userName,
@@ -66,21 +87,20 @@ export default function Login()
         }
       });
     }
-    catch(err) {
-      console.error(err)
-    }
-
-    // If the user was not found reset the login form
-    if(response.data.err)
+    catch(err) 
     {
-      console.log(response.data.err);
+      // If the user was not found reset the login form
       resetUserName();
       resetPassword();
+      
+      console.error(err)
     }
-
-    // Only allow another request to go through if the component is still mounted
-    if(isMounted.current)
-      setIsSending(false);
+    finally 
+    {
+      // Only allow another request to go through if the component is still mounted
+      if(isMounted.current)
+        setIsSending(false);
+    }
   }, [userName, password, isSending, resetUserName, resetPassword]);
 
   return (
@@ -119,16 +139,23 @@ export default function Login()
           required
           {...bindPassword}
         />
-        <Button
-          type='submit'
-          variant='outlined'
-          color='primary'
-          className={classes.submit}
-          disabled={!(userName && password) || isSending}
-          fullWidth
-          onClick={sendLoginRequest}>
-          Login
-        </Button>
+        <Tooltip 
+          title='Username and Password fields must be filled'
+          disableHoverListener={isLoginReady}
+          placement='right'>
+          <span>
+            <Button
+              type='submit'
+              variant='outlined'
+              color='primary'
+              className={classes.submit}
+              disabled={!isLoginReady || isSending}
+              fullWidth
+              onClick={sendLoginRequest}>
+              Login
+            </Button>
+          </span>
+        </Tooltip>
         <Grid container alignItems='center'>
           <Grid xs={9} item>
             <Link to='/forgot'>
