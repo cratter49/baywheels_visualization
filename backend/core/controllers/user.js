@@ -9,8 +9,8 @@ exports.post = (req, res) => {
     if (!name || !password) 
     {
         return res.json({
-        success: false,
-        error: 'INVALID INPUTS',
+          success: false,
+          error: 'INVALID INPUTS',
         });
     }
 

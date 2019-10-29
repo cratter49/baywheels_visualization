@@ -7,6 +7,9 @@ import { useInput } from '../Hooks';
 // Material-UI
 import { Button, Container, CssBaseline, Grid, makeStyles, TextField, Tooltip, Typography } from '@material-ui/core';
 
+// Utilities
+import axios from 'axios';
+
 // Styles
 const useStyles = makeStyles({
   '@global': {
@@ -27,7 +30,11 @@ export default function Signup(props: Props)
 {
   const classes = useStyles();
 
-  // State with custom input hooks
+  //
+  // State
+  //
+
+  // Custom input hooks
   const { value: userName, bind: bindUserName, reset: resetUserName } = useInput('');
   const { value: password, bind: bindPassword, reset: resetPassword } = useInput('');
   const { value: confirmPassword, bind: bindConfirmPassword, reset: resetConfirmPassword } = useInput('');
@@ -35,7 +42,21 @@ export default function Signup(props: Props)
   const [isSending, setIsSending] = useState(false);
   const [isInputValid, setIsInputValid] = useState(true);
 
+  //
+  // Refs
+  //
+
   const isMounted = useRef(true);
+
+  //
+  // Vars
+  //
+
+  let isSignupReady = !!(userName && password && confirmPassword)
+
+  //
+  // React Hooks
+  //
 
   useEffect(() => {
     return () => {
@@ -46,6 +67,10 @@ export default function Signup(props: Props)
   const sendSignupRequest = useCallback(async () => {
     let response;
 
+    // If the request is still sending don't send another request
+    if(isSending)
+      return;
+
     if(password !== confirmPassword)
     {
       resetPassword();
@@ -54,15 +79,11 @@ export default function Signup(props: Props)
       setIsInputValid(false);
     }
 
-    // If the request is still sending don't send another request
-    if(isSending)
-      return;
-
     setIsSending(true);
 
     try {
       response = await axios.post('http://localhost:3001/api/createUser', {
-        params: {
+        body: {
           name: userName,
           password: password 
         }
@@ -75,9 +96,9 @@ export default function Signup(props: Props)
     // If the user already exists reset the signup form
     if(response.data.err)
     {
-      console.log(response.data.err);
       resetUserName();
       resetPassword();
+      resetConfirmPassword();
     }
 
     // Only allow another request to go through if the component is still mounted
@@ -110,7 +131,10 @@ export default function Signup(props: Props)
           required
           {...bindUserName}
         />
-        <Tooltip>
+        <Tooltip
+          title='Passwords must match'
+          placement='right'
+          open={false}>
           <TextField 
             id='password'
             name='password'
@@ -123,28 +147,42 @@ export default function Signup(props: Props)
             {...bindPassword}
           />
         </Tooltip>
-        <TextField 
-          id='confirmPassword'
-          name='confirmPassword'
-          label='Confirm Password'
-          type='password'
-          margin='normal'
-          variant='outlined'
-          disabled={!password}
-          fullWidth
-          required
-          {...bindConfirmPassword}
-        />
-        <Button
-          type='submit'
-          variant='outlined'
-          color='primary'
-          className={classes.submit}
-          disabled={!(userName && password && confirmPassword) || isSending}
-          fullWidth
-          onClick={sendSignupRequest}>
-          Create Account
-        </Button>
+        <Tooltip
+          title='Type password above first'
+          placement='right'
+          disableHoverListener={!!password}
+          disableFocusListener
+          disableTouchListener>
+          <TextField 
+            id='confirmPassword'
+            name='confirmPassword'
+            label='Confirm Password'
+            type='password'
+            margin='normal'
+            variant='outlined'
+            disabled={!password}
+            fullWidth
+            required
+            {...bindConfirmPassword}
+          />
+        </Tooltip>
+        <Tooltip
+          title='Username and Password fields must be filled'
+          disableHoverListener={isSignupReady}
+          placement='bottom'>
+          <span>
+            <Button
+              type='submit'
+              variant='outlined'
+              color='primary'
+              className={classes.submit}
+              disabled={!isSignupReady || isSending}
+              fullWidth
+              onClick={sendSignupRequest}>
+              Create Account
+            </Button>
+          </span>
+        </Tooltip>
       </form>
     </Container>
   );

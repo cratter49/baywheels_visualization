@@ -1,0 +1,19 @@
+{
+    "tasks": [
+        {
+            "label": "runClient",
+            "type": "npm",
+            "script": "build:sa",
+            "path": "client/",
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "runServer",
+            "type": "npm",
+            "script": "start",
+            "path": "backend/",
+            "problemMatcher": []
+        }
+    ]
+}
