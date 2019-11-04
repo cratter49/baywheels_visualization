@@ -52,11 +52,14 @@ export default function Login()
   //
 
   const isMounted = useRef(true);
+  const incorrectPassword = useRef(false);
+  const userMissing = useRef(false);
 
   //
   // Vars
   //
 
+  // The login is ready if t he username and password are populated
   let isLoginReady = !!(userName && password)
 
   //
@@ -88,11 +91,7 @@ export default function Login()
       });
     }
     catch(err) 
-    {
-      // If the user was not found reset the login form
-      resetUserName();
-      resetPassword();
-      
+    { 
       console.error(err)
     }
     finally 
@@ -101,6 +100,25 @@ export default function Login()
       if(isMounted.current)
         setIsSending(false);
     }
+
+    // Handled Errors
+    if(!response.data.success)
+    {
+      if(response.data.message === 'MISSING')
+      {
+        userMissing.current = true;
+
+        // If the user was not found reset the login form
+        resetUserName();
+        resetPassword();
+      }
+      else if(response.data.message === 'INCORRECT_PASSWORD')
+      {
+        incorrectPassword.current = true;
+
+        resetPassword();
+      }
+    }
   }, [userName, password, isSending, resetUserName, resetPassword]);
 
   return (
@@ -108,7 +126,7 @@ export default function Login()
       maxWidth='xs' 
       fixed={true}
       className={classes.container}>
-      <CssBaseline />
+      <CssBaseline/>
       <Typography
         component='h1' 
         variant='h5' 
@@ -117,32 +135,43 @@ export default function Login()
         Login
       </Typography>
       <form noValidate>
-        <TextField 
-          id='username'
-          name='username' 
-          label='Username'
-          margin='normal'
-          variant='filled'
-          autoFocus
-          fullWidth
-          required
-          {...bindUserName}
-        />
-        <TextField 
-          id='password'
-          name='password'
-          label='Password'
-          type='password'
-          margin='normal'
-          variant='filled'
-          fullWidth
-          required
-          {...bindPassword}
-        />
+        <Tooltip 
+          title='User could not be found'
+          placement='right'
+          open={userMissing.current}>
+          <TextField 
+            id='username'
+            name='username' 
+            label='Username'
+            margin='normal'
+            variant='filled'
+            autoFocus
+            fullWidth
+            required
+            onFocus={() => userMissing.current = false}
+            {...bindUserName}
+          />
+        </Tooltip>
+        <Tooltip 
+          title='Password entered is incorrect'
+          placement='right'
+          open={incorrectPassword.current}>
+          <TextField 
+            id='password'
+            name='password'
+            label='Password'
+            type='password'
+            margin='normal'
+            variant='filled'
+            fullWidth
+            required
+            {...bindPassword}
+          />
+        </Tooltip>
         <Tooltip 
           title='Username and Password fields must be filled'
-          disableHoverListener={isLoginReady}
-          placement='right'>
+          placement='right'
+          disableHoverListener={isLoginReady}>
           <span>
             <Button
               type='submit'

@@ -1,7 +1,7 @@
 const User = require('../models/user');
 
 // this method adds a new user in our database
-exports.post = (req, res) => {
+exports.post = (req, res, next) => {
     let user = new User();
 
     const { name, password } = req.body;
@@ -17,9 +17,16 @@ exports.post = (req, res) => {
     user.name = name;
     user.password = password;
 
-    user.save((err) => {
-        if (err) return res.json({ success: false, error: err });
-        return res.json({ success: true });
+    user.save((err, newUser) => {
+        if (err) 
+        {
+          if(err.code === 11000)
+            return res.json({ success: false, message: 'DUPLICATE' });
+          else
+            next(err);
+        }
+
+        return res.json({ user: newUser });
     });
 };  
 
@@ -27,25 +34,14 @@ exports.post = (req, res) => {
 exports.get = (req, res, next) => {
     const { name, password } = req.query;
   
-    User.find({name: name, password: password}, (err, data) => {
-      var result = {}, success = false;
-  
+    User.findOne({ name: name }, (err, user) => {  
       if (err)
-      {
         next(err);
-      }
-      else if(!data.length)
-      {
-        res.status(404).send('User was not found');
-      }
-      else
-      {
-        result.data = data;
-        success = true;
-      }
-  
-      result.success = success;
-  
-      return res.json(result);
+      else if(!user)
+        return res.json({ success: false, message: 'MISSING' });
+      else if(user.password !== password)
+        return res.json({ success: false, message: 'INCORRECT_PASSWORD' });
+    
+      return res.json({ user: user });
     });
   }

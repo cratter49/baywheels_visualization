@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch Chrome and Debug React App",
+            "name": "Client Attach",
             "type": "chrome",
             "request": "launch",
             "url": "http://localhost:8080",
@@ -16,9 +16,18 @@
             "runtimeExecutable": "/usr/bin/chromium-browser",
         },
         {
-            "name": "Debug Express Node.js Server",
+            "name": "Server Launch",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "${workspaceFolder}/backend/node_modules/node-dev/bin/node-dev",
+            "program": "${workspaceFolder}/backend/core/server.js",
+            "restart": true
+        },
+        {
+            "name": "Server Attach",
             "type": "node",
             "request": "attach",
+            "protocol": "inspector",
             "processId": "${command:PickProcess}"
         }
     ],
@@ -26,8 +35,8 @@
         {
             "name": "Client/Server",
             "configurations": [
-                "Launch Chrome and Debug React App", 
-                "Debug Express Node.js Server"
+                "Client Attach", 
+                "Server Launch"
             ]
         }
     ]

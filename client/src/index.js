@@ -6,6 +6,7 @@ import ReactDOM from 'react-dom';
 import 'typeface-roboto';
 
 // Utilities
+import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import { Route, BrowserRouter as Router, Link, Switch } from 'react-router-dom'
 
 // Components
@@ -23,10 +24,27 @@ const routing = (
       <Route component={NotFound} />
     </Switch>
   </Router>
-)
+);
+
+const defaultTheme = createMuiTheme({
+  overrides: {
+    MuiTooltip: {
+      tooltip: {
+        color: 'red',
+        fontSize: '15px'
+      }
+    }
+  }
+});
+
+const app = (
+  <ThemeProvider theme={defaultTheme}>
+    {routing}
+  </ThemeProvider>
+);
 
 ReactDOM.render(
-  routing,
+  app,
   document.getElementById('root')
 );
 

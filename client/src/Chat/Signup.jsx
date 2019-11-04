@@ -47,12 +47,15 @@ export default function Signup(props: Props)
   //
 
   const isMounted = useRef(true);
+  const userIsDuplicate = useRef(false);
 
   //
   // Vars
   //
 
-  let isSignupReady = !!(userName && password && confirmPassword)
+  let allFormsFilled = !!(userName && password && confirmPassword);
+  let doPasswordsMatch = allFormsFilled && password === confirmPassword;
+  let isSignupReady = allFormsFilled && doPasswordsMatch;
 
   //
   // React Hooks
@@ -81,24 +84,28 @@ export default function Signup(props: Props)
 
     setIsSending(true);
 
-    try {
+    try 
+    {
       response = await axios.post('http://localhost:3001/api/createUser', {
-        body: {
-          name: userName,
-          password: password 
-        }
+        name: userName,
+        password: password 
       });
     }
-    catch(err) {
+    catch(err) 
+    {
       console.error(err)
     }
 
-    // If the user already exists reset the signup form
-    if(response.data.err)
+    // Handled Errors
+    if(!response.data.success)
     {
-      resetUserName();
-      resetPassword();
-      resetConfirmPassword();
+      // If the user already exists reset the signup form
+      if(response.data.message === 'DUPLICATE')
+      {
+        userIsDuplicate.current = true;
+
+        resetUserName();
+      }
     }
 
     // Only allow another request to go through if the component is still mounted
@@ -120,21 +127,29 @@ export default function Signup(props: Props)
         Sign Up
       </Typography>
       <form noValidate>
+      <Tooltip
+          title='Username entered already exists'
+          placement='right'
+          open={userIsDuplicate.current}>
         <TextField 
           id='username'
           name='username' 
           label='Username'
           margin='normal'
           variant='outlined'
+          onFocus={() => userIsDuplicate.current = false} // Dismiss tooltip once user inputs new username
           autoFocus
           fullWidth
           required
           {...bindUserName}
         />
+      </Tooltip>
         <Tooltip
           title='Passwords must match'
           placement='right'
-          open={false}>
+          disableFocusListener={doPasswordsMatch}
+          disableHoverListener
+          disableTouchListener>
           <TextField 
             id='password'
             name='password'
@@ -167,7 +182,7 @@ export default function Signup(props: Props)
           />
         </Tooltip>
         <Tooltip
-          title='Username and Password fields must be filled'
+          title={!allFormsFilled ? 'Username and Password fields must be filled' : 'Passwords do not match'}
           disableHoverListener={isSignupReady}
           placement='bottom'>
           <span>
