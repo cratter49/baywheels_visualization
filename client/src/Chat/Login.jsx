@@ -6,7 +6,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 // Hooks
-import { useInput } from '../Hooks';
+import { useInput, useRequest } from '../Hooks';
 
 // Utilities
 import axios from 'axios';
@@ -40,17 +40,16 @@ export default function Login()
   // State
   //
 
-  // Custom input hooks
+  // Custom hooks
   const { value: userName, bind: bindUserName, reset: resetUserName } = useInput('');
   const { value: password, bind: bindPassword, reset: resetPassword } = useInput('');
 
-  const [errorMessage, setErrorMessage] = useState('');
-  const [isSending, setIsSending] = useState(false);
-
+  const [{ responseData, isLoading, isError }, getUser] = useRequest('http://localhost:3001/api/getUser', 'GET');
   //
   // Refs
   //
 
+  const firstUpdate = useRef(true);
   const isMounted = useRef(true);
   const incorrectPassword = useRef(false);
   const userMissing = useRef(false);
@@ -63,63 +62,67 @@ export default function Login()
   let isLoginReady = !!(userName && password)
 
   //
+  // Helper Functions
+  //
+
+  const sendLoginRequest = function(event)
+  {
+    getUser({ 
+      params: {
+        name: userName,
+        password: password
+      } 
+    }); 
+
+    event.preventDefault();
+  };
+
+  //
   // React Hooks
   //
 
+  // Mark that the component has unmounted
   useEffect(() => {
     return () => {
       isMounted.current = false
     }
   }, []);
 
-  const sendLoginRequest = useCallback(async () => {
-    let response;
-
-    // If the request is still sending don't send another request
-    if(isSending)
+  
+  // Login Request Error Handling
+  useEffect(() => {
+    // Do not run error handling when we first mount
+    if(firstUpdate.current)
+    {
+      firstUpdate.current = false;
       return;
-
-    setIsSending(true);
-
-    try 
-    {
-      response = await axios.get('http://localhost:3001/api/getUser', {
-        params: {
-          name: userName,
-          password: password 
-        }
-      });
-    }
-    catch(err) 
-    { 
-      console.error(err)
-    }
-    finally 
-    {
-      // Only allow another request to go through if the component is still mounted
-      if(isMounted.current)
-        setIsSending(false);
     }
 
+    if(isError)
+      console.log(isError);
     // Handled Errors
-    if(!response.data.success)
+    else if(responseData && !responseData.success)
     {
-      if(response.data.message === 'MISSING')
+      // If the user was not found reset the login form
+      if(responseData.message === 'MISSING')
       {
         userMissing.current = true;
 
-        // If the user was not found reset the login form
         resetUserName();
         resetPassword();
       }
-      else if(response.data.message === 'INCORRECT_PASSWORD')
+      // If the password was incorrect reset the password field
+      else if(responseData.message === 'INCORRECT_PASSWORD')
       {
         incorrectPassword.current = true;
 
         resetPassword();
       }
     }
-  }, [userName, password, isSending, resetUserName, resetPassword]);
+
+    // Only run this effect when response data from a login request has changed
+    // eslint-disable-next-line react-hooks/exhaustive-deps 
+  }, [responseData, isError])
 
   return (
     <Container 
@@ -134,7 +137,7 @@ export default function Login()
         gutterBottom={true}>
         Login
       </Typography>
-      <form noValidate>
+      <form onSubmit={sendLoginRequest}>
         <Tooltip 
           title='User could not be found'
           placement='right'
@@ -165,6 +168,7 @@ export default function Login()
             variant='filled'
             fullWidth
             required
+            onFocus={() => incorrectPassword.current = false}
             {...bindPassword}
           />
         </Tooltip>
@@ -178,9 +182,8 @@ export default function Login()
               variant='outlined'
               color='primary'
               className={classes.submit}
-              disabled={!isLoginReady || isSending}
-              fullWidth
-              onClick={sendLoginRequest}>
+              disabled={!isLoginReady || isLoading}
+              fullWidth>
               Login
             </Button>
           </span>

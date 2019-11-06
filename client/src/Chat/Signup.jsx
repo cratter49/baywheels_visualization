@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 // Hooks
-import { useInput } from '../Hooks';
+import { useInput, useRequest } from '../Hooks';
 
 // Material-UI
 import { Button, Container, CssBaseline, Grid, makeStyles, TextField, Tooltip, Typography } from '@material-ui/core';
@@ -34,18 +34,20 @@ export default function Signup(props: Props)
   // State
   //
 
-  // Custom input hooks
+  const [isInputValid, setIsInputValid] = useState(true);
+
+  // Custom hooks
   const { value: userName, bind: bindUserName, reset: resetUserName } = useInput('');
   const { value: password, bind: bindPassword, reset: resetPassword } = useInput('');
   const { value: confirmPassword, bind: bindConfirmPassword, reset: resetConfirmPassword } = useInput('');
 
-  const [isSending, setIsSending] = useState(false);
-  const [isInputValid, setIsInputValid] = useState(true);
+  const [{ responseData, isLoading, isError }, createUser] = useRequest('http://localhost:3001/api/createUser', 'POST');
 
   //
   // Refs
   //
 
+  const firstUpdate = useRef(true);
   const isMounted = useRef(true);
   const userIsDuplicate = useRef(false);
 
@@ -58,6 +60,20 @@ export default function Signup(props: Props)
   let isSignupReady = allFormsFilled && doPasswordsMatch;
 
   //
+  // Helper Functions
+  //
+
+  const sendSignupRequest = function(event)
+  {
+    createUser({ 
+      name: userName,
+      password: password
+    }); 
+
+    event.preventDefault();
+  };
+
+  //
   // React Hooks
   //
 
@@ -67,40 +83,21 @@ export default function Signup(props: Props)
     }
   }, []);
 
-  const sendSignupRequest = useCallback(async () => {
-    let response;
-
-    // If the request is still sending don't send another request
-    if(isSending)
+  useEffect(() => {
+    // Do not run error handling when we first mount
+    if(firstUpdate.current)
+    {
+      firstUpdate.current = false;
       return;
-
-    if(password !== confirmPassword)
-    {
-      resetPassword();
-      resetConfirmPassword();
-
-      setIsInputValid(false);
     }
 
-    setIsSending(true);
-
-    try 
-    {
-      response = await axios.post('http://localhost:3001/api/createUser', {
-        name: userName,
-        password: password 
-      });
-    }
-    catch(err) 
-    {
-      console.error(err)
-    }
-
-    // Handled Errors
-    if(!response.data.success)
+    if(isError)
+      console.log(isError);
+        // Handled Errors
+    else if(!responseData.success)
     {
       // If the user already exists reset the signup form
-      if(response.data.message === 'DUPLICATE')
+      if(responseData.message === 'DUPLICATE')
       {
         userIsDuplicate.current = true;
 
@@ -108,10 +105,9 @@ export default function Signup(props: Props)
       }
     }
 
-    // Only allow another request to go through if the component is still mounted
-    if(isMounted.current)
-      setIsSending(false);
-  }, [userName, password, confirmPassword, isSending, resetUserName, resetPassword, resetConfirmPassword]);
+    // Only run this effect when response data from a signup request has changed
+    // eslint-disable-next-line react-hooks/exhaustive-deps 
+  }, [responseData, isError]);
 
   return (
     <Container 
@@ -126,7 +122,7 @@ export default function Signup(props: Props)
         gutterBottom={true}>
         Sign Up
       </Typography>
-      <form noValidate>
+      <form onSubmit={sendSignupRequest}>      
       <Tooltip
           title='Username entered already exists'
           placement='right'
@@ -191,9 +187,8 @@ export default function Signup(props: Props)
               variant='outlined'
               color='primary'
               className={classes.submit}
-              disabled={!isSignupReady || isSending}
-              fullWidth
-              onClick={sendSignupRequest}>
+              disabled={!isSignupReady || isLoading}
+              fullWidth>
               Create Account
             </Button>
           </span>
