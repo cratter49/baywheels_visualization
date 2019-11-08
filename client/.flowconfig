@@ -7,9 +7,9 @@
 [lints]
 
 [options]
-module.name_mapper='^Chat\([^\.].*\)$' -> '<PROJECT_ROOT>/src/Chat/\1'
+module.name_mapper='^BayWheels\([^\.].*\)$' -> '<PROJECT_ROOT>/src/BayWheels/\1'
 module.name_mapper='^Hooks\([^\.].*\)$' -> '<PROJECT_ROOT>/src/Hooks/\1'
-module.name_mapper='^Utilities\([^\.].*\)$' -> '<PROJECT_ROOT>/src/Chat/\1'
+module.name_mapper='^Utilities\([^\.].*\)$' -> '<PROJECT_ROOT>/src/Utilities/\1'
 module.file_ext=.js
 module.file_ext=.jsx
 module.file_ext=.json

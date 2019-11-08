@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import renderer from 'react-test-renderer';
 
 // Components
-import { Login } from '../Chat/Login';
+import { Login } from '../UserManagement/Login';
 import { Button } from '@material-ui/core';
 
 it('renders without crashing', () => {

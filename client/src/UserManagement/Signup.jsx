@@ -9,6 +9,7 @@ import { Button, Container, CssBaseline, Grid, makeStyles, TextField, Tooltip, T
 
 // Utilities
 import axios from 'axios';
+import { useHistory } from 'react-router-dom';
 
 // Styles
 const useStyles = makeStyles({
@@ -59,6 +60,8 @@ export default function Signup(props: Props)
   let doPasswordsMatch = allFormsFilled && password === confirmPassword;
   let isSignupReady = allFormsFilled && doPasswordsMatch;
 
+  let history = useHistory();
+
   //
   // Helper Functions
   //
@@ -94,7 +97,7 @@ export default function Signup(props: Props)
     if(isError)
       console.log(isError);
         // Handled Errors
-    else if(!responseData.success)
+    else if(responseData && responseData.success === false)
     {
       // If the user already exists reset the signup form
       if(responseData.message === 'DUPLICATE')
@@ -103,6 +106,10 @@ export default function Signup(props: Props)
 
         resetUserName();
       }
+    }
+    else
+    {
+      history.push('/');
     }
 
     // Only run this effect when response data from a signup request has changed

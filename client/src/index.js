@@ -10,7 +10,7 @@ import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import { Route, BrowserRouter as Router, Link, Switch } from 'react-router-dom'
 
 // Components
-import { Chat, Login, Signup } from './Chat';
+import { Login, Signup } from './UserManagement';
 import { NotFound } from './Utilities';
 
 require("babel-polyfill");
@@ -20,7 +20,6 @@ const routing = (
     <Switch>
       <Route exact path="/" component={Login} />
       <Route path="/signup" component={Signup} />
-      <Route path="/chat" component={Chat} />
       <Route component={NotFound} />
     </Switch>
   </Router>

@@ -5,7 +5,7 @@ const FlowWebpackPlugin = require('flow-webpack-plugin');
 
 module.exports = {
     entry: {
-      chat: './src/index.js',
+      baywheels: './src/index.js',
     },
     module: {
       rules: [

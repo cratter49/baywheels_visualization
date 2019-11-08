@@ -12,6 +12,7 @@ import { useInput, useRequest } from '../Hooks';
 import axios from 'axios';
 import classNames from 'classnames';
 import { Link } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 // Material-UI
 import { Button, Container, CssBaseline, Grid, makeStyles, TextField, Tooltip, Typography } from '@material-ui/core';
@@ -45,6 +46,7 @@ export default function Login()
   const { value: password, bind: bindPassword, reset: resetPassword } = useInput('');
 
   const [{ responseData, isLoading, isError }, getUser] = useRequest('http://localhost:3001/api/getUser', 'GET');
+
   //
   // Refs
   //
@@ -57,6 +59,8 @@ export default function Login()
   //
   // Vars
   //
+
+  let history = useHistory();
 
   // The login is ready if t he username and password are populated
   let isLoginReady = !!(userName && password)
@@ -101,7 +105,7 @@ export default function Login()
     if(isError)
       console.log(isError);
     // Handled Errors
-    else if(responseData && !responseData.success)
+    else if(responseData && responseData.success === false)
     {
       // If the user was not found reset the login form
       if(responseData.message === 'MISSING')
@@ -118,6 +122,11 @@ export default function Login()
 
         resetPassword();
       }
+    }
+    // Login was successful
+    else
+    {
+      history.push('/baywheels');
     }
 
     // Only run this effect when response data from a login request has changed

@@ -1,8 +1,8 @@
 {
-  "name": "chat_application",
+  "name": "baywheels_visualization",
   "version": "1.0.0",
   "author": "Daniel Wiseman",
-  "description": "A fully functioning chat application with a client and server implemented using the MERN stack.",
+  "description": "Visualize SF Bay Wheels rides by creating a heat map of rides taken in San Francisco during a selected time period using Lyft's publicly available ride data.",
   "license": "MIT",
   "main": "index.js",
   "scripts": {
@@ -10,12 +10,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cratter49/chat_application.git"
+    "url": "git+https://github.com/cratter49/baywheels_visualization.git"
   },
   "bugs": {
-    "url": "https://github.com/cratter49/chat_application/issues"
+    "url": "https://github.com/cratter49/baywheels_visualization/issues"
   },
-  "homepage": "https://github.com/cratter49/chat_application#readme",
+  "homepage": "https://github.com/cratter49/baywheels_visualization#readme",
   "dependencies": {
     "concurrently": "^5.0.0"
   },
