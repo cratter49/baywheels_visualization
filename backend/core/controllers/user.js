@@ -6,7 +6,7 @@ exports.post = (req, res, next) => {
 
     const { name, password } = req.body;
 
-    if (!name || !password) 
+    if(!name || !password) 
     {
         return res.json({
           success: false,
@@ -18,7 +18,7 @@ exports.post = (req, res, next) => {
     user.password = password;
 
     user.save((err, newUser) => {
-        if (err) 
+        if(err) 
         {
           if(err.code === 11000)
             return res.json({ success: false, message: 'DUPLICATE' });

@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 
 export const useRequest = (initialURL, methodType) => {
-    const [queryData, setQueryData] = useState();
+    const [queryData, setQueryData] = useState('');
     const [responseData, setResponseData] = useState(null);
     const [url, setUrl] = useState(initialURL);
     const [isLoading, setIsLoading] = useState(false);
