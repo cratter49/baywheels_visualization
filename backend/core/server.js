@@ -9,13 +9,15 @@ const express = require('express');
 // Utilities
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const cors_proxy = require('cors-anywhere');
 const fs = require('fs');
 const logger = require('morgan');
 const path = require('path');
 
-const API_PORT = 3001;
+const API_PORT = 3001 || process.env.port;
 const app = express();
 app.use(cors());
+
 const router = express.Router();
 
 // this is our MongoDB database from "MongoDB Atlas"
@@ -44,10 +46,16 @@ fs.readdirSync(path.join(__dirname, 'routes')).map(file => {
   require('./routes/' + file)(router);
 });
 
-// append /user for our http requests
+// append /api for our http requests
 app.use('/api', router);
 
 // launch our backend into a port
 var server = app.listen(API_PORT, () => console.log(`LISTENING ON PORT ${API_PORT}`));
+
+// TODO for real time data
+// app.get('/proxy', function(req, res) {
+//   req.url = req.url.replace('/proxy/', '/'); // Strip "/proxy" from the front of the URL.
+//   cors_proxy.emit('request', req, res);
+// });
 
 module.exports = server;

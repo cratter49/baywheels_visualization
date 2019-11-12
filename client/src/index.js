@@ -10,6 +10,7 @@ import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import { Route, BrowserRouter as Router, Link, Switch } from 'react-router-dom'
 
 // Components
+import { MapContainer } from './BayWheels';
 import { Login, Signup } from './UserManagement';
 import { NotFound } from './Utilities';
 
@@ -20,6 +21,7 @@ const routing = (
     <Switch>
       <Route exact path="/" component={Login} />
       <Route path="/signup" component={Signup} />
+      <Route path="/baywheels" component={MapContainer} />
       <Route component={NotFound} />
     </Switch>
   </Router>
