@@ -46,6 +46,10 @@ module.exports = {
       contentBase: './public',
       publicPath: '/',
       hot: true,
-      historyApiFallback: true
+      historyApiFallback: true,
+      overlay: {
+        warnings: true,
+        errors: true
+      }
     }
   };
